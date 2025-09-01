@@ -532,3 +532,33 @@ h1 {
         flex-direction: column;
     }
 }
+
+/* Watermark */
+.watermark {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.watermark span {
+    background: rgba(0, 0, 0, 0.3);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    opacity: 0.8;
+}
+
+.watermark:hover span {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.5);
+    color: rgba(255, 255, 255, 0.9);
+    transform: scale(1.05);
+}
