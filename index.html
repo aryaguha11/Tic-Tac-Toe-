@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="particles-container" id="particles"></div>
+    
+    <div class="container">
+        <header>
+            <div class="title-container">
+                <i class="fas fa-gamepad title-icon"></i>
+                <h1>Tic Tac Toe</h1>
+            </div>
+            <div class="game-info">
+                <div class="status" id="status">
+                    <i class="fas fa-users status-icon"></i>
+                    <span>Choose game mode</span>
+                </div>
+                <div class="score">
+                    <span class="player-x">
+                        <i class="fas fa-times"></i>
+                        <span id="score-x">0</span>
+                    </span>
+                    <span class="player-o">
+                        <i class="fas fa-circle"></i>
+                        <span id="score-o">0</span>
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Game Mode Selection -->
+        <div class="game-mode-selection" id="game-mode-selection">
+            <h2><i class="fas fa-cog"></i> Select Game Mode</h2>
+            <div class="mode-buttons">
+                <button class="btn btn-primary mode-btn" data-mode="pvp">
+                    <i class="fas fa-users"></i>
+                    <span>Player vs Player</span>
+                </button>
+                <button class="btn btn-secondary mode-btn" data-mode="pvc">
+                    <i class="fas fa-robot"></i>
+                    <span>Player vs Computer</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Difficulty Selection (for Player vs Computer) -->
+        <div class="difficulty-selection" id="difficulty-selection" style="display: none;">
+            <h2><i class="fas fa-brain"></i> Select Difficulty</h2>
+            <div class="difficulty-buttons">
+                <button class="btn btn-easy difficulty-btn" data-difficulty="easy">
+                    <i class="fas fa-seedling"></i>
+                    <span>Easy</span>
+                </button>
+                <button class="btn btn-medium difficulty-btn" data-difficulty="medium">
+                    <i class="fas fa-balance-scale"></i>
+                    <span>Medium</span>
+                </button>
+                <button class="btn btn-hard difficulty-btn" data-difficulty="hard">
+                    <i class="fas fa-skull"></i>
+                    <span>Hard</span>
+                </button>
+            </div>
+            <button class="btn btn-secondary back-btn" id="back-to-mode">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Mode Selection</span>
+            </button>
+        </div>
+
+        <main id="game-main" style="display: none;">
+            <div class="game-board" id="game-board">
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+                <div class="cell" data-cell></div>
+            </div>
+
+            <div class="controls">
+                <button id="restart-btn" class="btn btn-primary">
+                    <i class="fas fa-redo"></i>
+                    <span>Restart Game</span>
+                </button>
+                <button id="reset-score-btn" class="btn btn-secondary">
+                    <i class="fas fa-trash"></i>
+                    <span>Reset Score</span>
+                </button>
+                <button id="change-mode-btn" class="btn btn-secondary">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Change Mode</span>
+                </button>
+            </div>
+        </main>
+
+        <div class="winning-message" id="winning-message">
+            <div class="winning-content">
+                <div class="winning-icon" id="winning-icon"></div>
+                <div class="winning-text" id="winning-text"></div>
+                <button id="restart-win-btn" class="btn btn-primary">
+                    <i class="fas fa-play"></i>
+                    <span>Play Again</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sound effects -->
+    <audio id="click-sound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
+    </audio>
+    <audio id="win-sound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
+    </audio>
+    <audio id="draw-sound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
+    </audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
