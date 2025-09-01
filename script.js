@@ -13,6 +13,7 @@ class TicTacToe {
         this.initializeElements();
         this.addEventListeners();
         this.createParticles();
+        this.initSoundSystem();
         this.showGameModeSelection();
     }
 
@@ -28,17 +29,23 @@ class TicTacToe {
         this.winningText = document.getElementById('winning-text');
         this.winningIcon = document.getElementById('winning-icon');
         this.restartWinBtn = document.getElementById('restart-win-btn');
+        this.soundToggleBtn = document.getElementById('sound-toggle');
         
         // Game mode elements
         this.gameModeSelection = document.getElementById('game-mode-selection');
         this.difficultySelection = document.getElementById('difficulty-selection');
         this.gameMain = document.getElementById('game-main');
         this.backToModeBtn = document.getElementById('back-to-mode');
-        
-        // Sound elements
-        this.clickSound = document.getElementById('click-sound');
-        this.winSound = document.getElementById('win-sound');
-        this.drawSound = document.getElementById('draw-sound');
+    }
+
+    initSoundSystem() {
+        // Initialize Web Audio API
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            console.log('Audio system initialized');
+        } catch (e) {
+            console.log('Web Audio API not supported');
+        }
     }
 
     createParticles() {
@@ -69,12 +76,14 @@ class TicTacToe {
         this.cells.forEach(cell => {
             cell.addEventListener('click', (e) => this.handleCellClick(e));
             cell.addEventListener('mouseenter', (e) => this.handleCellHover(e));
+            cell.addEventListener('mouseleave', (e) => this.handleCellLeave(e));
         });
 
         this.restartBtn.addEventListener('click', () => this.restartGame());
         this.resetScoreBtn.addEventListener('click', () => this.resetScore());
         this.changeModeBtn.addEventListener('click', () => this.showGameModeSelection());
         this.restartWinBtn.addEventListener('click', () => this.restartGame());
+        this.soundToggleBtn.addEventListener('click', () => this.toggleSound());
         
         // Back button event listener with error handling
         if (this.backToModeBtn) {
@@ -89,11 +98,18 @@ class TicTacToe {
         // Game mode selection
         document.querySelectorAll('.mode-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.selectGameMode(e.target.closest('.mode-btn').dataset.mode));
+            btn.addEventListener('mouseenter', () => this.playHoverSound());
         });
 
         // Difficulty selection
         document.querySelectorAll('.difficulty-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.selectDifficulty(e.target.closest('.difficulty-btn').dataset.difficulty));
+            btn.addEventListener('mouseenter', () => this.playHoverSound());
+        });
+
+        // Add hover sounds to all buttons
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', () => this.playHoverSound());
         });
 
         // Keyboard shortcuts
@@ -106,6 +122,19 @@ class TicTacToe {
                 this.showGameModeSelection();
             }
         });
+    }
+
+    toggleSound() {
+        this.soundEnabled = !this.soundEnabled;
+        this.soundToggleBtn.classList.toggle('muted', !this.soundEnabled);
+        this.soundToggleBtn.innerHTML = this.soundEnabled ? 
+            '<i class="fas fa-volume-up"></i>' : 
+            '<i class="fas fa-volume-mute"></i>';
+        
+        // Play a test sound
+        if (this.soundEnabled) {
+            this.playClickSound();
+        }
     }
 
     handleKeyboard(e) {
@@ -127,7 +156,13 @@ class TicTacToe {
         if (this.board[Array.from(this.cells).indexOf(e.target)] === '' && this.gameActive) {
             e.target.style.transform = 'translateY(-3px) scale(1.05)';
             e.target.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.2)';
+            this.playHoverSound();
         }
+    }
+
+    handleCellLeave(e) {
+        e.target.style.transform = '';
+        e.target.style.boxShadow = '';
     }
 
     showGameModeSelection() {
@@ -147,7 +182,7 @@ class TicTacToe {
 
     selectGameMode(mode) {
         this.gameMode = mode;
-        this.playSound(this.clickSound);
+        this.playClickSound();
         
         if (mode === 'pvp') {
             this.startGame();
@@ -165,7 +200,7 @@ class TicTacToe {
 
     selectDifficulty(difficulty) {
         this.difficulty = difficulty;
-        this.playSound(this.clickSound);
+        this.playClickSound();
         this.startGame();
     }
 
@@ -214,7 +249,7 @@ class TicTacToe {
         this.board[cellIndex] = player;
         this.cells[cellIndex].textContent = player;
         this.cells[cellIndex].classList.add(player.toLowerCase());
-        this.playSound(this.clickSound);
+        this.playClickSound();
         this.createMoveEffect(this.cells[cellIndex]);
     }
 
@@ -356,7 +391,7 @@ class TicTacToe {
         if (draw) {
             this.winningText.textContent = "It's a draw!";
             this.winningIcon.innerHTML = '<i class="fas fa-handshake"></i>';
-            this.playSound(this.drawSound);
+            this.playDrawSound();
         } else {
             let winnerText;
             if (this.gameMode === 'pvc') {
@@ -370,7 +405,7 @@ class TicTacToe {
             this.winningText.textContent = winnerText;
             this.scores[this.currentPlayer]++;
             this.updateScore();
-            this.playSound(this.winSound);
+            this.playWinSound();
             this.createConfetti();
         }
         
@@ -462,10 +497,54 @@ class TicTacToe {
         this.restartGame();
     }
 
-    playSound(audio) {
-        if (this.soundEnabled && audio) {
-            audio.currentTime = 0;
-            audio.play().catch(e => console.log('Audio play failed:', e));
+    // Sound methods using Web Audio API
+    playClickSound() {
+        if (this.soundEnabled) {
+            this.playTone(800, 0.1, 0.1);
+        }
+    }
+
+    playHoverSound() {
+        if (this.soundEnabled) {
+            this.playTone(600, 0.05, 0.05);
+        }
+    }
+
+    playWinSound() {
+        if (this.soundEnabled) {
+            this.playTone(1000, 0.2, 0.3);
+            setTimeout(() => this.playTone(1200, 0.2, 0.3), 200);
+            setTimeout(() => this.playTone(1400, 0.2, 0.3), 400);
+        }
+    }
+
+    playDrawSound() {
+        if (this.soundEnabled) {
+            this.playTone(400, 0.15, 0.2);
+            setTimeout(() => this.playTone(500, 0.15, 0.2), 200);
+        }
+    }
+
+    playTone(frequency, duration, volume) {
+        if (this.audioContext) {
+            try {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(volume, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + duration);
+            } catch (e) {
+                console.log('Tone generation failed:', e);
+            }
         }
     }
 }

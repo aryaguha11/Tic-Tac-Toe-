@@ -155,6 +155,31 @@ h1 {
     border: 2px solid rgba(52, 152, 219, 0.3);
 }
 
+.sound-btn {
+    background: none;
+    border: none;
+    color: #667eea;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    margin-left: 1rem;
+}
+
+.sound-btn:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: scale(1.1);
+}
+
+.sound-btn.muted {
+    color: #999;
+}
+
+.sound-btn.muted i {
+    text-decoration: line-through;
+}
+
 .game-board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
