@@ -556,7 +556,7 @@ h1 {
     }
     
     .watermark {
-        bottom: 3px;
+        top: 3px;
         right: 3px;
         left: 3px;
         text-align: center;
@@ -571,7 +571,7 @@ h1 {
 /* Watermark */
 .watermark {
     position: fixed;
-    bottom: 20px;
+    top: 20px;
     right: 20px;
     z-index: 1000;
     pointer-events: none;
